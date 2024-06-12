@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddOpenTelemetry()
     .WithMetrics(builder => builder
         // Metrics provider from OpenTelemetry
         .AddRuntimeInstrumentation()
+        .AddProcessInstrumentation()
         .AddAspNetCoreInstrumentation()
         // Metrics provides by ASP.NET Core in .NET 8
         .AddMeter("Microsoft.AspNetCore.Hosting")
@@ -101,6 +103,7 @@ app.MapPrometheusScrapingEndpoint().AllowAnonymous();
 app.UseRateLimiter();
 
 app.MapReverseProxy();
+
 
 app.Run();
 
