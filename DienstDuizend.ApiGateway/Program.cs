@@ -15,10 +15,14 @@ builder.Configuration
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(builder => builder
-        // .AddConsoleExporter()
-        .AddPrometheusExporter() // We use v1.7 because currently v1.8 has an issue with formatting.
+        // Metrics provider from OpenTelemetry
+        .AddRuntimeInstrumentation()
         .AddAspNetCoreInstrumentation()
-);
+        // Metrics provides by ASP.NET Core in .NET 8
+        .AddMeter("Microsoft.AspNetCore.Hosting")
+        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+        .AddPrometheusExporter()); // We use v1.7 because currently v1.8 has an issue with formatting.
+
 
 builder.Services.AddAuthentication(options =>
 {
@@ -97,4 +101,7 @@ app.MapPrometheusScrapingEndpoint().AllowAnonymous();
 app.UseRateLimiter();
 
 app.MapReverseProxy();
+
 app.Run();
+
+
